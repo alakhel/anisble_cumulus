@@ -1,0 +1,5 @@
+trunk on bond also
+vlan trame trip 
+alias
+disable lldp on mgmt
+activate portsecurity

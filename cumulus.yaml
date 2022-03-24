@@ -1,0 +1,118 @@
+---
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWA1                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWA1
+  hosts: SWA1
+  tasks:
+    - name: SWA1 \ Modify hostname 
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-SWA1
+       abort: true #clean the queue
+       commit: true
+    - name: SWA1 \ activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3,swp4,swp5
+       commit: true
+    - name: SWA1 \ bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2 # towards SWD
+          - add bond bond1 bond slaves swp3-4 # towards NFTS SERVER
+       commit: true
+    - name: SWA1 \ Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0-1
+          - add bridge bridge ports swp5 # towards user
+          - add bridge bridge vids 20,30,90
+          - add bridge bridge pvid 99
+          - add bond bond1 bridge access 90 #server NTFS  
+          - add interface swp5 bridge access 20 #server NTFS  
+          #- add int bond bond0 bridge trunk vlans 20,30,90
+       commit: true
+
+
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWA2                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWA2
+  hosts: SWA2
+  tasks:
+    - name: Modify hostname 
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-SWA2
+       abort: true #clean the queue
+       commit: true  
+    - name: activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3
+       commit: true
+    - name: bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2 # towards SWD
+       commit: true
+    - name: Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0
+          - add bridge bridge ports swp3 # towards user
+          - add bridge bridge vids 20,30,90
+          - add bridge bridge pvid 99
+          - add interface swp3 bridge access 30
+       commit: true
+
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWD1                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWD1
+  hosts: SWD1
+  tasks:
+    - name: Modify hostname and abort the queue before
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-SWD1
+       abort: true
+    - name: activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3,swp4
+       commit: true
+    - name: bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2
+          - add bond bond1 bond slaves swp3-4
+       commit: true
+    - name: Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0-1
+          - add bridge bridge vids 20,30,90
+          - add bridge bridge pvid 99
+       commit: true
+    - name: SVI setup
+      community.network.nclu:
+       commands:
+          - add vlan 20 ip address 192.168.2.1/24
+          - add vlan 30 ip address 192.168.3.1/24
+          - add vlan 90 ip address 192.168.0.1/24
+       commit: true
+    - name: ACL setup
+      community.network.nclu:
+       commands:
+          - add acl ipv4 EXAMPLE1 accept tcp source-ip 10.0.14.2/32 source-port any dest-ip 10.0.15.8/32 dest-port any
+          - add int swp1 acl ipv4 EXAMPLE1 inbound
+       commit: true
+

@@ -1,0 +1,163 @@
+---
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWA1                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWA1
+  hosts: P2SWA1
+  tasks:
+    - name: P2SWA1 \ Modify hostname 
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-P2-SWA1
+       abort: true #clean the queue
+       commit: true
+    - name: SWA1 \ activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3,swp4,swp4,swp5 #swp1-2 used for bond0, swp3 bond1 MLAG-Host1, swp4 bond3 MLAG-Host2, swp5-6 peerlink
+       commit: true
+    - name: SWA1 \ bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2 # towards SWD
+          - add bond bond0 alias towards SWD-Bond0
+          ######
+          - add bond bond1 bond slaves swp3 # MLAG-Host1 
+          - add bond bond1 alias Bond1 on swp3 - MLAG-Host1
+         ######
+          - add bond bond2 bond slaves swp4 # MLAG-Host2
+          - add bond bond2 alias Bond2 on swp4 - MLAG-Host2
+#          - add bond peerlink bond slaves swp5-6 # Inter-chasis bond peer link ####No need in v4.2
+
+       commit: true
+    - name: SWA1 \ MLAG Setup
+      community.network.nclu:
+       commands:
+          - add bond bond1 clag id 1
+          - add bond bond2 clag id 2
+       commit: true
+
+ 
+    - name: SWA1 \ Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0,bond1,bond2
+          - add bridge bridge vids 10,20
+#          - add bridge bridge ports peerlink
+          - add bridge bridge pvid 99
+          - add bond bond1 bridge access 10
+          - add bond bond2 bridge access 20
+          - add bond bond0 bridge trunk vlans 10,20
+
+       commit: true
+    - name: SWA1 \ MLAG PEERLINK Setup
+      community.network.nclu:
+       commands:
+          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp5-6 primary backup-ip 10.0.0.1
+       atomic: true
+
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWA2                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWA2
+  hosts: P2SWA2
+  tasks:
+    - name: Modify hostname 
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-P2-SWA2
+       abort: true #clean the queue
+       commit: true  
+    - name: SWA2 \ activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3,swp4,swp4,swp5 #swp1-2 used for bond0, swp3 bond1 MLAG-Host1, swp4 bond3 MLAG-Host2, swp5-6 peerlink
+       commit: true
+    - name: SWA2 \ bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2 # towards SWD
+          - add bond bond0 alias towards SWD-Bond0
+          ######
+          - add bond bond1 bond slaves swp3 # MLAG-Host1 
+          - add bond bond1 alias Bond1 on swp3 - MLAG-Host1
+         ######
+          - add bond bond2 bond slaves swp4 # MLAG-Host2
+          - add bond bond2 alias Bond2 on swp4 - MLAG-Host2
+#          - add bond peerlink bond slaves swp5-6 # Inter-chasis bond peer link ####No need in v4.2
+
+       commit: true
+    - name: SWA2 \ MLAG Setup
+      community.network.nclu:
+       commands:
+          - add bond bond1 clag id 1
+          - add bond bond2 clag id 2
+       commit: true
+
+    - name: SWA2 \ Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0,bond1,bond2
+          - add bridge bridge vids 10,20
+          - add bridge bridge pvid 99
+          - add bond bond1 bridge access 10
+          - add bond bond2 bridge access 20
+          - add bond bond0 bridge trunk vlans 10,20
+       commit: true
+    - name: SWA2 \ MLAG PEERLINK Setup
+      community.network.nclu:
+       commands:
+          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp5-6 primary backup-ip 10.0.0.2
+       atomic: true
+
+
+######################################################################
+#                                                                    #
+#                             FR-EVERY-SWD1                          #
+#                                                                    #
+######################################################################
+- name: Configuration of SWD1
+  hosts: P2SWD1
+  tasks:
+    - name: Modify hostname and abort the queue before
+      community.network.nclu:
+       commands:
+          - add hostname FR-EVERY-P2-SWD1
+       abort: true
+    - name: activatoin des ports
+      community.network.nclu:
+       commands:
+          - add int swp1,swp2,swp3,swp4
+       commit: true
+    - name: bonding setup
+      community.network.nclu:
+       commands:
+          - add bond bond0 bond slaves swp1-2
+          - add bond bond0 alias Bond0(swp1-2) to SWA1     
+          - add bond bond1 bond slaves swp3-4
+          - add bond bond1 alias Bond1(swp3-4) to SWA2      
+
+       commit: true
+    - name: Bridging setup
+      community.network.nclu:
+       commands:
+          - add bridge bridge ports bond0,bond1
+          - add bridge bridge vids 10,20
+          - add bridge bridge pvid 99
+          - add bond bond0 bridge trunk vlans 10,20
+          - add bond bond1 bridge trunk vlans 10,20
+                    
+       commit: true
+    - name: IP setup
+      community.network.nclu:
+       commands:
+          - add vlan 20 ip address 192.168.20.1/24
+          - add vlan 10 ip address 192.168.10.1/24
+       atomic: true
+       description: IP bond0-1 added
+
+
