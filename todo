@@ -3,3 +3,10 @@ vlan trame trip
 alias
 disable lldp on mgmt
 activate portsecurity
+
+
+switch2:swp4 --- host2:P1 ==> Vlan20#
+switch1:swp4 --- host2:P2 ==> Vlan20
+
+switch2:swp3 --- host1:P2 => Vlan10#
+switch3:swp3 --- host1:P1 => Vlan10
