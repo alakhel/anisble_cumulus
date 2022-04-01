@@ -45,10 +45,18 @@
        commands:
           - add bridge bridge ports bond0,bond1,bond2
           - add bridge bridge vids 10,20
-#          - add bridge bridge ports peerlink
           - add bridge bridge pvid 99
+          #######
           - add bond bond1 bridge access 10
+          - add bond bond1 bond lacp-bypass-allow
+          - net add bond bond1 stp bpduguard 
+          - net add bond bond1 stp portadminedge
+          #######
           - add bond bond2 bridge access 20
+          - add bond bond2 bond lacp-bypass-allow
+          - net add bond bond2 stp bpduguard
+          - net add bond bond2 stp portadminedge
+          #######
           - add bond bond0 bridge trunk vlans 10,20
 
        commit: true
@@ -88,7 +96,6 @@
          ######
           - add bond bond2 bond slaves swp4 # MLAG-Host2
           - add bond bond2 alias Bond2 on swp4 - MLAG-Host2
-#          - add bond peerlink bond slaves swp5-6 # Inter-chasis bond peer link ####No need in v4.2
 
        commit: true
     - name: SWA2 \ MLAG Setup
@@ -104,14 +111,17 @@
           - add bridge bridge ports bond0,bond1,bond2
           - add bridge bridge vids 10,20
           - add bridge bridge pvid 99
+          #######
           - add bond bond1 bridge access 10
           - add bond bond1 bond lacp-bypass-allow
           - net add bond bond1 stp bpduguard 
           - net add bond bond1 stp portadminedge
+          #######
           - add bond bond2 bridge access 20
           - add bond bond2 bond lacp-bypass-allow
           - net add bond bond2 stp bpduguard
           - net add bond bond2 stp portadminedge
+          #######
           - add bond bond0 bridge trunk vlans 10,20
        commit: true
     - name: SWA2 \ MLAG PEERLINK Setup
