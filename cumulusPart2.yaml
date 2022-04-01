@@ -49,13 +49,13 @@
           #######
           - add bond bond1 bridge access 10
           - add bond bond1 bond lacp-bypass-allow
-          - net add bond bond1 stp bpduguard 
-          - net add bond bond1 stp portadminedge
+          - add bond bond1 stp bpduguard 
+          - add bond bond1 stp portadminedge
           #######
           - add bond bond2 bridge access 20
           - add bond bond2 bond lacp-bypass-allow
-          - net add bond bond2 stp bpduguard
-          - net add bond bond2 stp portadminedge
+          - add bond bond2 stp bpduguard
+          - add bond bond2 stp portadminedge
           #######
           - add bond bond0 bridge trunk vlans 10,20
 
@@ -114,13 +114,13 @@
           #######
           - add bond bond1 bridge access 10
           - add bond bond1 bond lacp-bypass-allow
-          - net add bond bond1 stp bpduguard 
-          - net add bond bond1 stp portadminedge
+          - add bond bond1 stp bpduguard 
+          - add bond bond1 stp portadminedge
           #######
           - add bond bond2 bridge access 20
           - add bond bond2 bond lacp-bypass-allow
-          - net add bond bond2 stp bpduguard
-          - net add bond bond2 stp portadminedge
+          - add bond bond2 stp bpduguard
+          - add bond bond2 stp portadminedge
           #######
           - add bond bond0 bridge trunk vlans 10,20
        commit: true
