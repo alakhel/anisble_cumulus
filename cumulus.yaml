@@ -17,12 +17,19 @@
       community.network.nclu:
        commands:
           - add int swp1,swp2,swp3,swp4,swp5
+          - add interface swp5 stp bpduguard 
+          - add interface swp5 stp portadminedge
        commit: true
     - name: SWA1 \ bonding setup
       community.network.nclu:
        commands:
           - add bond bond0 bond slaves swp1-2 # towards SWD
           - add bond bond1 bond slaves swp3-4 # towards NFTS SERVER
+          - add bond bond0 alias Bond0(swp1-2) to SWD1 
+          - add bond bond1 alias Bond1(swp3-4) to NFTS SERVER
+          - add bond bond1 stp bpduguard 
+          - add bond bond1 stp portadminedge
+
        commit: true
     - name: SWA1 \ Bridging setup
       community.network.nclu:
@@ -32,10 +39,18 @@
           - add bridge bridge vids 20,30,90
           - add bridge bridge pvid 99
           - add bond bond1 bridge access 90 #server NTFS  
-          - add interface swp5 bridge access 20 #server NTFS  
-          #- add int bond bond0 bridge trunk vlans 20,30,90
+          - add interface swp5 bridge access 20 #server NTFS 
+          - add bond bond0 bridge trunk vlans 30,20,90 
        commit: true
-
+    - name: PortSecurity setup
+      community.network.nclu:
+       commands:
+          - add interface swp5 port-security sticky-mac
+          - add interface swp5 port-security sticky-mac timeout 2000
+          - add interface swp5 port-security sticky-mac aging
+          - add interface swp5 port-security violation shutdown
+          - add interface swp5 port-security violation timeout 3600
+       commit: true    
 
 ######################################################################
 #                                                                    #
@@ -60,6 +75,7 @@
       community.network.nclu:
        commands:
           - add bond bond0 bond slaves swp1-2 # towards SWD
+          - add bond bond0 alias Bond0(swp1-2) to SWD1
        commit: true
     - name: Bridging setup
       community.network.nclu:
@@ -69,7 +85,9 @@
           - add bridge bridge vids 20,30,90
           - add bridge bridge pvid 99
           - add interface swp3 bridge access 30
+          - add bond bond0 bridge trunk vlans 30,20,90 
        commit: true
+
 
 ######################################################################
 #                                                                    #
@@ -94,6 +112,8 @@
        commands:
           - add bond bond0 bond slaves swp1-2
           - add bond bond1 bond slaves swp3-4
+          - add bond bond0 alias Bond0(swp1-2) to SWA1
+          - add bond bond1 alias Bond1(swp3-4) to SWA2
        commit: true
     - name: Bridging setup
       community.network.nclu:
@@ -101,6 +121,8 @@
           - add bridge bridge ports bond0-1
           - add bridge bridge vids 20,30,90
           - add bridge bridge pvid 99
+          - add bond bond0 bridge trunk vlans 30,20,90 
+
        commit: true
     - name: SVI setup
       community.network.nclu:
@@ -112,7 +134,17 @@
     - name: ACL setup
       community.network.nclu:
        commands:
-          - add acl ipv4 EXAMPLE1 accept tcp source-ip 10.0.14.2/32 source-port any dest-ip 10.0.15.8/32 dest-port any
-          - add int swp1 acl ipv4 EXAMPLE1 inbound
-       commit: true
+
+          #- add acl ipv4 ACL_DENY_SSH_BeetweenV20_V30 drop tcp source-ip 192.168.2.0/24 source-port any dest-ip 192.168.3.0/24 dest-port ssh
+          #- add acl ipv4 ACL_DENY_SSH_BeetweenV30_V20 drop tcp source-ip 192.168.3.0/24 source-port any dest-ip 192.168.2.0/24 dest-port ssh
+          
+          #- add acl ipv4 ACL_DENY_ICMP_BeetweenV20_V30 drop icmp source-ip 192.168.2.0/24 dest-ip 192.168.3.0/24 
+          #- add acl ipv4 ACL_DENY_ICMP_BeetweenV30_V20 drop icmp source-ip 192.168.3.0/24 dest-ip 192.168.2.0/24
+          
+          #- add vlan 20 acl ipv4 ACL_DENY_SSH_BeetweenV20_V30 inbound
+          #- add vlan 30 acl ipv4 ACL_DENY_SSH_BeetweenV30_V20 inbound
+
+          #- add vlan 20 acl ipv4 ACL_DENY_ICMP_BeetweenV20_V30 inbound
+          #- add vlan 30 acl ipv4 ACL_DENY_ICMP_BeetweenV30_V20 inbound          
+       atomic: true
 
