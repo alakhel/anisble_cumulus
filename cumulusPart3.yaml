@@ -53,7 +53,7 @@
     - name: SWA1 \ MLAG PEERLINK Setup
       community.network.nclu:
        commands:
-          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp5-6 primary backup-ip 10.0.0.1
+          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp3-4 primary backup-ip 10.0.0.1
        atomic: true
 
 ######################################################################
@@ -110,7 +110,7 @@
     - name: SWA2 \ MLAG PEERLINK Setup
       community.network.nclu:
        commands:
-          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp5-6 primary backup-ip 10.0.0.2
+          - add clag peer sys-mac 44:38:39:FF:00:AA interface swp3-4 primary backup-ip 10.0.0.2
        atomic: true
 
 
@@ -153,6 +153,11 @@
           - add bond bond2 bridge trunk vlans 10,20
                     
        commit: true
+    - name: SWD1 \ MLAG PEERLINK Setup
+      community.network.nclu:
+       commands:
+          - add clag peer sys-mac 44:38:39:FF:00:BB interface swp3-4 primary backup-ip 10.0.1.1
+       atomic: true
 #    - name: IP setup
 #      community.network.nclu:
 #       commands:
@@ -209,6 +214,11 @@
           - add bond bond2 bridge trunk vlans 10,20
                     
        commit: true
+    - name: SWD2 \ MLAG PEERLINK Setup
+      community.network.nclu:
+       commands:
+          - add clag peer sys-mac 44:38:39:FF:00:BB interface swp3-4 primary backup-ip 10.0.1.2
+       atomic: true
 #    - name: IP setup
 #      community.network.nclu:
 #       commands:
