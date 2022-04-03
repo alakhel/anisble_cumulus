@@ -7,49 +7,47 @@
 - name: Configuration of SWA1
   hosts: SWA1
   tasks:
-    - name: P3SWA1 \ Modify hostname 
+    - name: SWA1 \ Modify hostname 
       community.network.nclu:
        commands:
-          - add hostname FR-EVERY-P3-SWA1
+          - add hostname FR-EVERY-SWA1
        abort: true #clean the queue
        commit: true
     - name: SWA1 \ activatoin des ports
       community.network.nclu:
        commands:
-          - add int swp1,swp2,swp3,swp4,swp4,swp5 #swp1-2 used for bond0, swp3 bond1 MLAG-Host1, swp4 bond3 MLAG-Host2, swp5-6 peerlink
+          - add int swp1,swp2,swp3,swp4,swp4,swp5,swp6
        commit: true
     - name: SWA1 \ bonding setup
       community.network.nclu:
        commands:
-          - add bond bond0 bond slaves swp1-2 # towards SWD
-          - add bond bond0 alias towards SWD-Bond0
+          - add bond uplink0 bond slaves swp1-2
+          - add bond uplink0 alias MLAG _ SWD
           ######
-          - add bond bond1 bond slaves swp3 # MLAG-Host1 
-          - add bond bond1 alias Bond1 on swp3 - MLAG-Host1
+          - add bond bond1 bond slaves swp5 # MLAG-Host1 
+          - add bond bond1 alias Bond1 on swp5 - MLAG-Host1
          ######
-          - add bond bond2 bond slaves swp4 # MLAG-Host2
-          - add bond bond2 alias Bond2 on swp4 - MLAG-Host2
-#          - add bond peerlink bond slaves swp5-6 # Inter-chasis bond peer link ####No need in v4.2
+          - add bond bond2 bond slaves swp6 # MLAG-Host2
+          - add bond bond2 alias Bond2 on swp6 - MLAG-Host2
 
        commit: true
     - name: SWA1 \ MLAG Setup
       community.network.nclu:
        commands:
-          - add bond bond1 clag id 1
-          - add bond bond2 clag id 2
+          - add bond bond1 clag id 1 #for host 1
+          - add bond bond2 clag id 2 #for host 2
        commit: true
 
  
     - name: SWA1 \ Bridging setup
       community.network.nclu:
        commands:
-          - add bridge bridge ports bond0,bond1,bond2
+          - add bridge bridge ports uplink0,bond1,bond2
           - add bridge bridge vids 10,20
-#          - add bridge bridge ports peerlink
           - add bridge bridge pvid 99
           - add bond bond1 bridge access 10
           - add bond bond2 bridge access 20
-          - add bond bond0 bridge trunk vlans 10,20
+          - add bond uplink0 bridge trunk vlans 10,20
 
        commit: true
     - name: SWA1 \ MLAG PEERLINK Setup
@@ -66,47 +64,48 @@
 - name: Configuration of SWA2
   hosts: SWA2
   tasks:
-    - name: Modify hostname 
+    - name: SWA2 \ Modify hostname 
       community.network.nclu:
        commands:
-          - add hostname FR-EVERY-P3-SWA2
+          - add hostname FR-EVERY-SWA2
        abort: true #clean the queue
-       commit: true  
+       commit: true
     - name: SWA2 \ activatoin des ports
       community.network.nclu:
        commands:
-          - add int swp1,swp2,swp3,swp4,swp4,swp5 #swp1-2 used for bond0, swp3 bond1 MLAG-Host1, swp4 bond3 MLAG-Host2, swp5-6 peerlink
+          - add int swp1,swp2,swp3,swp4,swp4,swp5,swp6
        commit: true
     - name: SWA2 \ bonding setup
       community.network.nclu:
        commands:
-          - add bond bond0 bond slaves swp1-2 # towards SWD
-          - add bond bond0 alias towards SWD-Bond0
+          - add bond uplink0 bond slaves swp1-2
+          - add bond uplink0 alias MLAG _ SWD
           ######
-          - add bond bond1 bond slaves swp3 # MLAG-Host1 
-          - add bond bond1 alias Bond1 on swp3 - MLAG-Host1
+          - add bond bond1 bond slaves swp5 # MLAG-Host1 
+          - add bond bond1 alias Bond1 on swp5 - MLAG-Host1
          ######
-          - add bond bond2 bond slaves swp4 # MLAG-Host2
-          - add bond bond2 alias Bond2 on swp4 - MLAG-Host2
-#          - add bond peerlink bond slaves swp5-6 # Inter-chasis bond peer link ####No need in v4.2
+          - add bond bond2 bond slaves swp6 # MLAG-Host2
+          - add bond bond2 alias Bond2 on swp6 - MLAG-Host2
 
        commit: true
     - name: SWA2 \ MLAG Setup
       community.network.nclu:
        commands:
-          - add bond bond1 clag id 1
-          - add bond bond2 clag id 2
+          - add bond bond1 clag id 1 #for host 1
+          - add bond bond2 clag id 2 #for host 2
        commit: true
 
+ 
     - name: SWA2 \ Bridging setup
       community.network.nclu:
        commands:
-          - add bridge bridge ports bond0,bond1,bond2
+          - add bridge bridge ports uplink0,bond1,bond2
           - add bridge bridge vids 10,20
           - add bridge bridge pvid 99
           - add bond bond1 bridge access 10
           - add bond bond2 bridge access 20
-          - add bond bond0 bridge trunk vlans 10,20
+          - add bond uplink0 bridge trunk vlans 10,20
+
        commit: true
     - name: SWA2 \ MLAG PEERLINK Setup
       community.network.nclu:
@@ -126,7 +125,7 @@
     - name: Modify hostname and abort the queue before
       community.network.nclu:
        commands:
-          - add hostname FR-EVERY-P2-SWD1
+          - add hostname FR-EVERY-SWD1
        abort: true
     - name: activatoin des ports
       community.network.nclu:
@@ -136,36 +135,38 @@
     - name: bonding setup
       community.network.nclu:
        commands:
-          - add bond bond0 bond slaves swp1-2
-          - add bond bond0 alias Bond0(swp1-2) to SWA1     
-          - add bond bond1 bond slaves swp3-4
-          - add bond bond1 alias Bond1(swp3-4) to SWA2      
+          - add bond bond1 bond slaves swp1 # MLAG-SWA1
+          - add bond bond1 alias Bond1 on swp1 - MLAG-SWA1
+         ######
+          - add bond bond2 bond slaves swp2 # MLAG-SWA2 
+          - add bond bond2 alias Bond2 on swp1 - MLAG-SWA2
+         ######
 
        commit: true
     - name: Bridging setup
       community.network.nclu:
        commands:
-          - add bridge bridge ports bond0,bond1
+          - add bridge bridge ports bond1,bond2
           - add bridge bridge vids 10,20
           - add bridge bridge pvid 99
-          - add bond bond0 bridge trunk vlans 10,20
           - add bond bond1 bridge trunk vlans 10,20
+          - add bond bond2 bridge trunk vlans 10,20
                     
        commit: true
-    - name: IP setup
-      community.network.nclu:
-       commands:
-          - add vlan 20 ip address 192.168.20.3/24
-          - add vlan 20 vrrp 44 192.168.20.1/24
-          - add vlan 20 vrrp 44 priority 254
-          - add vlan 20 vrrp 44 advertisement-interval 5000
+#    - name: IP setup
+#      community.network.nclu:
+#       commands:
+#          - add vlan 20 ip address 192.168.20.3/24
+#          - add vlan 20 vrrp 44 192.168.20.1/24
+#          - add vlan 20 vrrp 44 priority 254
+#          - add vlan 20 vrrp 44 advertisement-interval 5000
 
-          - add vlan 10 ip address 192.168.10.3/24
-          - add vlan 10 vrrp 44 192.168.10.1/24
-          - add vlan 10 vrrp 44 priority 254
-          - add vlan 10 vrrp 44 advertisement-interval 5000
-       atomic: true
-       description: IP bond0-1 added
+#          - add vlan 10 ip address 192.168.10.3/24
+#          - add vlan 10 vrrp 44 192.168.10.1/24
+#          - add vlan 10 vrrp 44 priority 254
+#          - add vlan 10 vrrp 44 advertisement-interval 5000
+#       atomic: true
+#       description: IP bond0-1 added
 
 
 
@@ -180,7 +181,7 @@
     - name: Modify hostname and abort the queue before
       community.network.nclu:
        commands:
-          - add hostname FR-EVERY-P2-SWD1
+          - add hostname FR-EVERY-SWD1
        abort: true
     - name: activatoin des ports
       community.network.nclu:
@@ -190,37 +191,35 @@
     - name: bonding setup
       community.network.nclu:
        commands:
-          - add bond bond0 bond slaves swp1-2
-          - add bond bond0 alias Bond0(swp1-2) to SWA1     
-          - add bond bond1 bond slaves swp3-4
-          - add bond bond1 alias Bond1(swp3-4) to SWA2      
+          - add bond bond1 bond slaves swp1 # MLAG-SWA1
+          - add bond bond1 alias Bond1 on swp2 - MLAG-SWA1
+         ######
+          - add bond bond2 bond slaves swp2 # MLAG-SWA2 
+          - add bond bond2 alias Bond2 on swp2 - MLAG-SWA2
+         ######
 
        commit: true
     - name: Bridging setup
       community.network.nclu:
        commands:
-          - add bridge bridge ports bond0,bond1
+          - add bridge bridge ports bond1,bond2
           - add bridge bridge vids 10,20
           - add bridge bridge pvid 99
-          - add bond bond0 bridge trunk vlans 10,20
           - add bond bond1 bridge trunk vlans 10,20
+          - add bond bond2 bridge trunk vlans 10,20
                     
        commit: true
-    - name: IP setup
-      community.network.nclu:
-       commands:
-          - add vlan 20 ip address 192.168.20.3/24
-          - add vlan 20 vrrp 44 192.168.20.1/24
-          - add vlan 20 vrrp 44 priority 250
-          - add vlan 20 vrrp 44 advertisement-interval 5000
+#    - name: IP setup
+#      community.network.nclu:
+#       commands:
+#          - add vlan 20 ip address 192.168.20.3/24
+#          - add vlan 20 vrrp 44 192.168.20.1/24
+#          - add vlan 20 vrrp 44 priority 254
+#          - add vlan 20 vrrp 44 advertisement-interval 5000
 
-          - add vlan 10 ip address 192.168.10.3/24
-          - add vlan 10 vrrp 44 192.168.10.1/24
-          - add vlan 10 vrrp 44 priority 250
-          - add vlan 10 vrrp 44 advertisement-interval 5000
-       atomic: true
-       description: IP bond0-1 added
-
-# net show vrrp ROUTER-ID
-
-
+#          - add vlan 10 ip address 192.168.10.3/24
+#          - add vlan 10 vrrp 44 192.168.10.1/24
+#          - add vlan 10 vrrp 44 priority 254
+#          - add vlan 10 vrrp 44 advertisement-interval 5000
+#       atomic: true
+#       description: IP bond0-1 added
