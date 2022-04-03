@@ -5,7 +5,7 @@
 #                                                                    #
 ######################################################################
 - name: Configuration of SWA1
-  hosts: P3SWA1
+  hosts: SWA1
   tasks:
     - name: P3SWA1 \ Modify hostname 
       community.network.nclu:
@@ -64,7 +64,7 @@
 #                                                                    #
 ######################################################################
 - name: Configuration of SWA2
-  hosts: P3SWA2
+  hosts: SWA2
   tasks:
     - name: Modify hostname 
       community.network.nclu:
@@ -121,7 +121,7 @@
 #                                                                    #
 ######################################################################
 - name: Configuration of SWD1
-  hosts: P3SWD1
+  hosts: SWD1
   tasks:
     - name: Modify hostname and abort the queue before
       community.network.nclu:
@@ -175,7 +175,7 @@
 #                                                                    #
 ######################################################################
 - name: Configuration of SWD1
-  hosts: P3SWD1
+  hosts: SWD1
   tasks:
     - name: Modify hostname and abort the queue before
       community.network.nclu:
