@@ -127,6 +127,7 @@
        commands:
           - add hostname FR-EVERY-SWD1
        abort: true
+       commit: true
     - name: activatoin des ports
       community.network.nclu:
        commands:
@@ -180,14 +181,15 @@
 #                             FR-EVERY-SWD2                          #
 #                                                                    #
 ######################################################################
-- name: Configuration of SWD1
-  hosts: SWD1
+- name: Configuration of SWD2
+  hosts: SWD2
   tasks:
     - name: Modify hostname and abort the queue before
       community.network.nclu:
        commands:
-          - add hostname FR-EVERY-SWD1
+          - add hostname FR-EVERY-SWD2
        abort: true
+       commit: true
     - name: activatoin des ports
       community.network.nclu:
        commands:
