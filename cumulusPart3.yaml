@@ -153,6 +153,12 @@
           - add bond bond2 bridge trunk vlans 10,20
                     
        commit: true
+    - name: SWA2 \ MLAG Setup
+      community.network.nclu:
+       commands:
+          - add bond bond1 clag id 3 #for host 1
+          - add bond bond2 clag id 4 #for host 2
+       commit: true       
     - name: SWD1 \ MLAG PEERLINK Setup
       community.network.nclu:
        commands:
@@ -203,6 +209,12 @@
           - add bond bond2 alias Bond2 on swp2 - MLAG-SWA2
          ######
 
+       commit: true
+    - name: SWA2 \ MLAG Setup
+      community.network.nclu:
+       commands:
+          - add bond bond1 clag id 3 #for host 1
+          - add bond bond2 clag id 4 #for host 2
        commit: true
     - name: Bridging setup
       community.network.nclu:
