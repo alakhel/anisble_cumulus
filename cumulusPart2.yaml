@@ -53,7 +53,7 @@
           - add bond bond1 stp portadminedge
           #######
           - add bond bond2 bridge access 20
-          #- add bond bond2 bond lacp-bypass-allow
+          #x- add bond bond2 bond lacp-bypass-allow
           - add bond bond2 stp bpduguard
           - add bond bond2 stp portadminedge
           #######
@@ -161,6 +161,7 @@
     - name: Bridging setup
       community.network.nclu:
        commands:
+          - add bridge stp treeprio 8192
           - add bridge bridge ports bond0,bond1
           - add bridge bridge vids 10,20
           - add bridge bridge pvid 99
