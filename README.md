@@ -1,9 +1,7 @@
 # ansible_cumulus
 ![](RackMultipart20220411-4-12wtqc_html_23768ca39a132272.png) ![](RackMultipart20220411-4-12wtqc_html_e2db356408442ac6.png) ![Shape1](RackMultipart20220411-4-12wtqc_html_ee2b371845eab381.gif)
 
-**Saliha BASSAID**
 
-**saliha.bassaid@etud.univ-evry.fr**
 
 # ­
 
